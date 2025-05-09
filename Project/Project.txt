@@ -1,0 +1,48 @@
+from google.colab import files
+
+
+uploaded = files.upload()
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import PassiveAggressiveClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix
+print("Loading dataset...")
+df = pd.read_csv('news.csv')
+print(f"Dataset loaded successfully with {len(df)} entries.\n")
+print("Sample data:\n", df.head())
+X = df['News']
+y = df['Fake']
+print("\nSplitting the dataset into training and testing sets...")
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+print(f"Training set size: {len(X_train)}, Testing set size: {len(X_test)}")
+print("\nVectorizing text data using TF-IDF...")
+vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
+X_train_tfidf = vectorizer.fit_transform(X_train)
+X_test_tfidf = vectorizer.transform(X_test)
+print("Text vectorization complete.")
+print("\nTraining the classifier...")
+model = PassiveAggressiveClassifier(max_iter=50)
+model.fit(X_train_tfidf, y_train)
+print("Model training complete.")
+print("\nEvaluating model on test data...")
+y_pred = model.predict(X_test_tfidf)
+accuracy = accuracy_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+print(f"\nModel Accuracy: {round(accuracy * 100, 2)}%")
+print("Confusion Matrix:")
+print(conf_matrix)
+def predict_news(news_text):
+    vectorized = vectorizer.transform([news_text])
+    result = model.predict(vectorized)
+    return result[0]
+print("\nYou can now enter your own news content to test the model.")
+print("Type 'exit' to end the program.")
+
+while True:
+    user_input = input("\nEnter news article:\n")
+    if user_input.lower() == 'exit':
+        print("Exiting program.")
+        break
+    prediction = predict_news(user_input)
+    print(f"\nPrediction: This news is *{prediction}*")
