@@ -1,14 +1,10 @@
-from google.colab import files
-
-
-uploaded = files.upload()
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import PassiveAggressiveClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix
 print("Loading dataset...")
-df = pd.read_csv('news.csv')
+df = pd.read_csv(r'C:\Users\UCEP.STUDENT\Downloads\news.csv')
 print(f"Dataset loaded successfully with {len(df)} entries.\n")
 print("Sample data:\n", df.head())
 X = df['News']
